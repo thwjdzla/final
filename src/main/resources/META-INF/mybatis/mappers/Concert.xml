@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.ConcertDao">
+
+	<resultMap type="Concert" id="ConcertMap">
+		<id property="ccNo" column="concert_no" />
+		<result property="ccName" column="concert_name"/>
+		<result property="ccLocationlat" column="concert_locationlat"/>
+		<result property="ccLocationlng" column="concert_locationlng"/>
+		<result property="ccCount" column="concert_count"/>
+		<result property="ccContents" column="concert_contents"/>
+		<result property="cpNo" column="cp_no"/>
+		<result property="ccImg" column="concert_img"/>
+		<result property="ccStartDate" column="concert_start_date"/>
+		<result property="ccEndDate" column="concert_end_date"/>
+		<result property="ccTel" column="concert_tel"/>
+		<result property="ccPhone" column="concert_phone"/>
+		<result property="ccOwner" column="concert_owner"/>
+		<result property="ccAddress" column="concert_address"/>
+		<result property="ccDetailAddress" column="concert_address_detail"/>
+	</resultMap>
+	
+	<update id="updateConcert" parameterType="Concert">
+		update
+			concert
+		<set>
+			concert_name = #{ccName}
+			, concert_contents = #{ccContents}
+			, concert_start_date = #{ccStartDate}
+			, concert_end_date = #{ccEndDate}
+			, concert_tel = #{ccTel}
+			, concert_phone = #{ccPhone}
+			, concert_owner = #{ccOwner}
+			, concert_address = #{ccAddress}
+			, concert_address_detail = #{ccDetailAddress}
+			<if test="ccLocationlat != null">
+			, concert_locationlat = #{ccLocationlat}
+			</if>
+			<if test="ccLocationlng != null">
+			, concert_locationlng = #{ccLocationlng}
+			</if>
+			<if test="ccImg != null">
+			, concert_img = #{ccImg}
+			</if>
+		</set>
+		where
+			cp_no = #{cpNo}
+	</update>
+	
+	<insert id="submitByConcert" parameterType="Concert">
+		insert into concert(concert_no, concert_name, concert_locationlat, concert_locationlng, concert_count
+							, concert_contents, cp_no, concert_img, concert_start_date, concert_end_date
+							, concert_tel, concert_phone, concert_owner, concert_address, concert_address_detail)
+		values(concert_seq.nextval, #{ccName}, #{ccLocationlat}, #{ccLocationlng}, 0, #{ccContents}, #{cpNo}
+				, #{ccImg}, #{ccStartDate}, #{ccEndDate}, #{ccTel}, #{ccPhone}, #{ccOwner}, #{ccAddress}, #{ccDetailAddress})
+	</insert>
+
+	<select id="getConcertRegisteredList" parameterType="int" resultType="ConcertListForm">
+		select
+			A.cp_no					cpNo,
+			A.user_no				userNo,
+			A.company_name			cpName,
+			A.company_status		cpStatus,
+			A.cp_type				cpType,
+			B.concert_no			ccNo,
+			B.concert_name			ccName,
+			B.concert_img			ccImg
+		from 
+			company A, concert B
+		where
+			A.cp_no = B.cp_no
+			and A.user_no = #{value}
+	</select>
+	<select id="searchConcertByNo" parameterType="int" resultType="Concert">
+		select
+			cp_no				cpNo,
+			concert_no			ccNo,
+			concert_name		ccName,
+			concert_img			ccImg,
+			concert_address		ccAddress,
+			concert_address_detail ccDetailAddress,
+			concert_Locationlat ccLocationlat,
+			concert_Locationlng ccLocationlng,
+			concert_owner	ccOwner,	
+			concert_phone	ccPhone,	
+			concert_tel	ccTel,	
+			concert_count ccCount,
+			concert_contents ccContents,
+			concert_start_date ccStartDate,
+			concert_end_date ccEndDate
+		from 
+			concert
+		where
+			cp_no = #{value}
+	</select>
+	<select id="searchConcertByCno" parameterType="int" resultType="Concert">
+		select
+			cp_no				cpNo,
+			concert_no			ccNo,
+			concert_name		ccName,
+			concert_img			ccImg,
+			concert_address		ccAddress,
+			concert_address_detail ccDetailAddress,
+			concert_Locationlat ccLocationlat,
+			concert_Locationlng ccLocationlng,
+			concert_owner	ccOwner,	
+			concert_phone	ccPhone,	
+			concert_tel	ccTel,	
+			concert_count ccCount,
+			concert_contents ccContents,
+			concert_start_date ccStartDate,
+			concert_end_date ccEndDate
+		from 
+			concert
+		where
+			concert_no = #{value}
+	</select>	
+	<select id="selectrecentConcert" resultMap="ConcertMap">
+	SELECT
+		rn, CONCERT_NO, CONCERT_NAME, CONCERT_COUNT, CONCERT_CONTENTS, CP_NO, CONCERT_START_DATE, CONCERT_END_DATE, CONCERT_IMG, CONCERT_LOCATIONLAT, CONCERT_LOCATIONLNG, CONCERT_ADDRESS, CONCERT_ADDRESS_DETAIL, CONCERT_TEL, CONCERT_PHONE, CONCERT_OWNER
+	from	(SELECT 
+		ROW_NUMBER() over (order by concert_no desc) rn, CONCERT_NO, CONCERT_NAME, CONCERT_COUNT, CONCERT_CONTENTS, CP_NO, CONCERT_START_DATE, CONCERT_END_DATE, CONCERT_IMG, CONCERT_LOCATIONLAT, CONCERT_LOCATIONLNG, CONCERT_ADDRESS, CONCERT_ADDRESS_DETAIL, CONCERT_TEL, CONCERT_PHONE, CONCERT_OWNER 
+		FROM CONCERT
+		order by concert_no desc
+	)
+	where rn &lt; 4
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<select id="searchAllConcertList"  resultMap="ConcertMap">
+		select 
+			cp_no				,
+			concert_no			,
+			concert_name		,
+			concert_img			,
+			concert_address		,
+			concert_address_detail ,
+			concert_Locationlat ,
+			concert_Locationlng ,
+			concert_owner	,	
+			concert_phone	,	
+			concert_tel	,	
+			concert_count ,
+			concert_contents ,
+			concert_start_date ,
+			concert_end_date 
+		from
+		Concert
+	</select>
+	
+	
+	<select id="searchConcert" parameterType="map" resultMap="ConcertMap">
+		select 
+			cp_no				,
+			concert_no			,
+			concert_name		,
+			concert_img			,
+			concert_address		,
+			concert_address_detail ,
+			concert_Locationlat ,
+			concert_Locationlng ,
+			concert_owner	,	
+			concert_phone	,	
+			concert_tel	,	
+			concert_count ,
+			concert_contents ,
+			concert_start_date ,
+			concert_end_date 
+		from
+			Concert
+		where
+			concert_Locationlat >= #{lowLat} and concert_Locationlat &lt;= #{highLat} 
+			and concert_Locationlng >= #{lowLon} and concert_Locationlng &lt;= #{highLon} 
+	</select>
+	
+	<select id="searchconcertall" parameterType="map" resultType="daummap">
+		select  DISTINCT
+			C.concert_name as name,
+			C.concert_Locationlat as lag,
+			C.concert_Locationlng as lon,
+			C.concert_img as img,
+			CA.cp_type as type
+		from Concert C, company CA
+		WHERE C.cp_no = CA.cp_no
+		and C.concert_Locationlat >= #{lowLat} and C.concert_Locationlat &lt;= #{highLat} 
+		and C.concert_Locationlng >= #{lowLon} and C.concert_Locationlng &lt;= #{highLon} 
+		
+	</select>
+	
+	
+	<select id="searchByname" parameterType="String" resultMap="ConcertMap">
+	select 
+			cp_no				,
+			concert_no			,
+			concert_name		,
+			concert_img			,
+			concert_address		,
+			concert_address_detail ,
+			concert_Locationlat ,
+			concert_Locationlng ,
+			concert_owner	,	
+			concert_phone	,	
+			concert_tel	,	
+			concert_count ,
+			concert_contents ,
+			concert_start_date ,
+			concert_end_date 
+		from
+		Concert
+		where concert_name like '%' || #{value} || '%'
+	</select>
+</mapper>

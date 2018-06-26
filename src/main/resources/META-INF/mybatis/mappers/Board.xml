@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.BoardDao">
+	<resultMap type="FAQ" id="FAQMap">
+		<id property="no" column="faq_no"/>
+		<result property="type" column="faq_type"/>
+		<result property="title" column="faq_title"/>
+		<result property="contents" column="faq_contents"/>
+	</resultMap>
+	
+	<select id="getAllFAQCount" parameterType="string" resultType="int">
+		select
+			count(*)
+		from
+			faq
+	</select>
+	
+	<select id="allFAQList" parameterType="Pagination" resultMap="FAQMap">
+		select rn, faq_no, faq_type, faq_title, faq_contents
+		from
+			(select
+				row_number() over(order by faq_no desc) rn,
+				faq_no,
+				faq_type,
+				faq_title,
+				faq_contents
+			from 
+				faq
+			order by
+				faq_no desc)
+		where
+			rn > #{count}*10 and rn &lt;= (#{count}*10+10)
+	</select>
+	
+	<insert id="submitQuestion" parameterType="Question">
+		insert into question
+			(question_no,
+			 question_title,
+			 question_type,
+			 question_contents,
+			 user_no,
+			 question_date,
+			 cp_no,
+			 question_img,
+			 question_status)
+		values
+			(question_seq.nextval, #{title}, #{type}, #{contents}, #{userNo}, sysdate, #{cpNo}, #{img}, '미답변')
+	</insert>
+	
+	<insert id="submitAdminQuestion" parameterType="AdminQuestion">
+		insert into admin_question
+			(admin_question_no,
+			 admin_question_title,
+			 admin_question_contents,
+			 admin_question_type,
+			 admin_question_date,
+			 user_no,
+			 admin_question_img,
+			 admin_question_status)
+		values
+			(admin_question_seq.nextval, #{title}, #{contents}, #{type}, sysdate, #{userNo}, #{img}, '미답변')
+	</insert>
+	
+	<!-- <select id="allQuestionList" parameterType="Map" resultType="QuestionForm">
+		select
+			A.question_no		no,
+			A.question_title	title,
+			A.question_type		type,
+			A.question_contents	contents,
+			A.user_no			userNo,
+			A.question_date		createDate,
+			A.cp_no				cpNo,
+			A.question_img		img,
+			A.question_status	status,
+			B.company_name		cpName
+		from
+			question A, company B
+		<where>
+			A.cp_no = B.cp_no
+			<if test='type == "U"'>
+				and A.user_no = #{no}
+			</if>
+			<if test='type == "C"'>
+				and A.cp_no in 
+				<foreach index="index" item="company" collection="companies" open="(" close=")" separator=",">
+					#{company.cpNo}
+				</foreach>
+			</if>
+		</where>
+		order by
+			A.question_date desc
+	</select> -->
+	
+	<select id="getAllQuestionCount" parameterType="Pagination" resultType="int">
+		select
+			count(*)
+		from
+			question A, company B
+		<where>
+			A.cp_no = B.cp_no
+			<if test='type == "U"'>
+				and A.user_no = #{no}
+			</if>
+			<if test='type == "C"'>
+				and A.cp_no in 
+				<foreach index="index" item="company" collection="companies" open="(" close=")" separator=",">
+					#{company.cpNo}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	
+	<select id="allQuestionList" parameterType="Pagination" resultType="QuestionForm">
+		select 
+			rn, no, title, type, contents, userNo, createDate, cpNo, img, status, cpName
+		from		
+			(select
+				row_number() over(order by A.question_date desc) rn,
+				A.question_no		no,
+				A.question_title	title,
+				A.question_type		type,
+				A.question_contents	contents,
+				A.user_no			userNo,
+				A.question_date		createDate,
+				A.cp_no				cpNo,
+				A.question_img		img,
+				A.question_status	status,
+				B.company_name		cpName
+			from
+				question A, company B
+			<where>
+				A.cp_no = B.cp_no
+				<if test='type == "U"'>
+					and A.user_no = #{no}
+				</if>
+				<if test='type == "C"'>
+					and A.cp_no in 
+					<foreach index="index" item="company" collection="companies" open="(" close=")" separator=",">
+						#{company.cpNo}
+					</foreach>
+				</if>
+			</where>
+			order by
+				A.question_date desc)
+		where
+			rn > #{count}*10 and rn &lt;= (#{count}*10+10)
+	</select>
+
+	
+	<select id="getQuestionByNo" parameterType="int" resultType="QuestionForm">
+		select
+			A.question_no		no,
+			A.question_title	title,
+			A.question_type		type,
+			A.question_contents	contents,
+			A.user_no			userNo,
+			A.question_date		createDate,
+			A.cp_no				cpNo,
+			A.question_img		img,
+			A.question_status	status,
+			B.company_name		cpName
+		from
+			question A, company B
+		where
+			A.cp_no = B.cp_no
+			and A.question_no = #{value}
+	</select>
+	
+	<select id="getAnswerByNo" parameterType="int" resultType="Answer">
+		select
+			answer_no			no,
+			answer_contents		contents,
+			question_no			questionNo,
+			answer_date			createDate,
+			cp_no				cpNo
+		from
+			answer
+		where
+			question_no = #{value}
+	</select>
+	
+	<update id="modifyQStatus" parameterType="int">
+		update 
+			question
+		set
+			question_status = '답변완료'
+		where
+			question_no = #{value}
+	</update>
+	
+	<insert id="addAnswer" parameterType="Answer">
+		insert into answer
+			(answer_no,
+			 answer_contents,
+			 question_no,
+			 answer_date,
+			 cp_no)
+		values
+			(answer_seq.nextval, #{contents}, #{questionNo}, sysdate, #{cpNo})			
+	</insert>
+	
+	<select id="getAdminQuestionByNo" parameterType="int" resultType="AdminQuestion">
+		select
+			admin_question_no			no,
+			admin_question_title		title,
+			admin_question_contents		contents,
+			admin_question_type			type,
+			admin_question_date			createDate,
+			user_no						userNo,
+			admin_question_img			img,
+			admin_question_status		status
+		from
+			admin_question
+		where
+			admin_question_no = #{value}
+	</select>
+	
+	<select id="getAdminAnswerByNo" parameterType="int" resultType="AdminAnswer">
+		select
+			admin_answer_no			no,
+			admin_answer_contents	contents,
+			admin_answer_date		createDate,
+			admin_question_no		questionNo
+		from
+			admin_answer
+		where
+			admin_question_no = #{value}
+	</select>
+	
+	<update id="modifyAStatus" parameterType="int">
+		update 
+			admin_question
+		set
+			admin_question_status = '답변완료'
+		where
+			admin_question_no = #{value}
+	</update>
+	
+	<insert id="addAdminAnswer" parameterType="AdminAnswer">
+		insert into admin_answer
+			(admin_answer_no,
+			 admin_answer_contents,
+			 admin_answer_date,
+			 admin_question_no)
+		values
+			(admin_answer_seq.nextval, #{contents}, sysdate, #{questionNo})
+	</insert>
+	
+	<!-- <select id="allAdminQuestionList" parameterType="Map" resultType="AdminQuestion">
+		select
+			admin_question_no			no,
+			admin_question_title		title,
+			admin_question_contents		contents,
+			admin_question_type			type,
+			admin_question_date			createDate,
+			user_no						userNo,
+			admin_question_img			img,
+			admin_question_status		status
+		from
+			admin_question
+		<where>
+			<if test='type == "U" || type == "C"'>
+				user_no = #{no}
+			</if>
+		</where>
+		order by
+			admin_question_date desc
+	</select> -->
+	
+	<select id="getAllAdminQuestionCount" parameterType="Pagination" resultType="int">
+		select
+			count(*)
+		from
+			admin_question
+		<where>
+			<if test='type == "U" || type == "C"'>
+				user_no = #{no}
+			</if>
+		</where>
+	</select>
+	
+	<select id="CadminCount" parameterType="Pagination" resultType="int">
+		select
+			count(*)
+		from
+			admin_question
+		where	
+			admin_question_type = 'C'
+	</select>
+	
+	<select id="UadminCount" parameterType="Pagination" resultType="int">
+		select
+			count(*)
+		from
+			admin_question
+		where	
+			admin_question_type = 'U'
+	</select>
+	
+	
+	<select id="allAdminQuestionList" parameterType="Pagination" resultType="AdminQuestion">
+		select 
+			rn, no, title, contents, type, createDate, userNo, img, status
+		from
+			(select
+				row_number() over(order by admin_question_date desc) rn,
+				admin_question_no			no,
+				admin_question_title		title,
+				admin_question_contents		contents,
+				admin_question_type			type,
+				admin_question_date			createDate,
+				user_no						userNo,
+				admin_question_img			img,
+				admin_question_status		status
+			from
+				admin_question
+			<where>
+				<if test='type == "U" || type == "C"'>
+					user_no = #{no}
+				</if>
+			</where>
+			order by
+				admin_question_date desc)
+		where
+			rn > #{count}*10 and rn &lt;= (#{count}*10+10)	
+	</select>
+	
+	<select id="companyAdminQuestionList" parameterType="Pagination" resultType="AdminQuestion">
+		select 
+			rn, no, title, contents, type, createDate, userNo, img, status
+		from
+			(select
+				row_number() over(order by admin_question_date desc) rn,
+				admin_question_no			no,
+				admin_question_title		title,
+				admin_question_contents		contents,
+				admin_question_type			type,
+				admin_question_date			createDate,
+				user_no						userNo,
+				admin_question_img			img,
+				admin_question_status		status
+			from
+				admin_question
+			where
+				admin_question_type = 'C'
+			order by
+				admin_question_date desc)
+		where
+			rn > #{count}*10 and rn &lt;= (#{count}*10+10)	
+	</select>
+	
+	<select id="userAdminQuestionList" parameterType="Pagination" resultType="AdminQuestion">
+		select 
+			rn, no, title, contents, type, createDate, userNo, img, status
+		from
+			(select
+				row_number() over(order by admin_question_date desc) rn,
+				admin_question_no			no,
+				admin_question_title		title,
+				admin_question_contents		contents,
+				admin_question_type			type,
+				admin_question_date			createDate,
+				user_no						userNo,
+				admin_question_img			img,
+				admin_question_status		status
+			from
+				admin_question
+			where
+				admin_question_type = 'U'
+			order by
+				admin_question_date desc)
+		where
+			rn > #{count}*10 and rn &lt;= (#{count}*10+10)	
+	</select>
+</mapper>

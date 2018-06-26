@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.HotelDao">
+	<resultMap type="Hotel" id="hotelMap">
+		<id property="no" column="hotel_no"/>
+		<result property="name" column="hotel_name"/>
+		<result property="address" column="hotel_address"/>
+		<result property="locationLat" column="hotel_locationlat"/>
+		<result property="locationLng" column="hotel_locationlng"/>
+		<result property="contents" column="hotel_contents"/>
+		<result property="tel" column="hotel_tel"/>
+		<result property="grade" column="hotel_grade"/>
+		<result property="star" column="hotel_star"/>
+		<result property="roomCount" column="room_count"/>
+		<result property="cpNo" column="cp_no"/>
+		<result property="img" column="hotel_img"/>
+		<result property="addressDetail" column="hotel_address_detail"/>
+		<result property="owner" column="hotel_owner"/>
+		<result property="phone" column="hotel_phone"/>
+	</resultMap>
+
+
+
+	<select id="searchHotelByNo" parameterType="int" resultMap="hotelMap">
+		select 
+			hotel_no, 
+			hotel_name, 
+			hotel_address, 
+			hotel_locationlat, 
+			hotel_locationlng, 
+			hotel_contents, 
+			hotel_tel, 
+			hotel_grade, 
+			hotel_star, 
+			room_count, 
+			cp_no, hotel_img, 
+			hotel_address_detail, 
+			hotel_owner, 
+			hotel_phone
+		from 
+			hotel 
+		where cp_no = #{no}
+	</select>
+	
+	<select id="searchHotelByHno" parameterType="int" resultMap="hotelMap">
+		select 
+			hotel_no, 
+			hotel_name, 
+			hotel_address, 
+			hotel_locationlat, 
+			hotel_locationlng, 
+			hotel_contents, 
+			hotel_tel, 
+			hotel_grade, 
+			hotel_star, 
+			room_count, 
+			cp_no, hotel_img, 
+			hotel_address_detail, 
+			hotel_owner, 
+			hotel_phone
+		from 
+			hotel 
+		where hotel_no = #{no}
+	</select>	
+	<insert id="submitByHotel" parameterType="Hotel">
+		insert into hotel (hotel_no, hotel_name, hotel_address, hotel_locationlat, hotel_locationlng, hotel_contents
+							, hotel_tel, hotel_grade, hotel_star, room_count, cp_no, hotel_img, hotel_address_detail
+							, hotel_owner, hotel_phone)
+		values (hotel_seq.nextval, #{name}, #{address}, #{locationLat}, #{locationLng}, #{contents}, #{tel}, 0, #{star}
+							, 0, #{cpNo}, #{img}, #{addressDetail}, #{owner}, #{phone})
+	</insert>
+	
+	<update id="updateHotel" parameterType="Hotel">
+		update
+			hotel
+		<set>
+			hotel_name = #{name}
+			, hotel_address = #{address}
+			, hotel_contents = #{contents}
+			, hotel_tel = #{tel}
+			, hotel_star = #{star}
+			, hotel_address_detail = #{addressDetail}
+			, hotel_owner = #{owner}
+			, hotel_phone = #{phone}
+			<if test="locationLat != null">
+			, hotel_locationlat = #{locationLat}
+			</if>
+			<if test="locationLng != null">
+			, hotel_locationlng = #{locationLng}
+			</if>
+			<if test="img != null">
+			, hotel_img = #{img}
+			</if>
+		</set>
+		where
+			cp_no = #{cpNo}
+	</update>
+	
+	<select id="getHotelRegisteredList" parameterType="int" resultType="HotelListForm">
+		select
+			A.cp_no					cpNo,
+			A.user_no				userNo,
+			A.company_name			cpName,
+			A.company_status		cpStatus,
+			A.cp_type				cpType,
+			B.hotel_no				no,
+			B.hotel_name			name,
+			B.hotel_img				img
+		from 
+			company A, hotel B
+		where
+			A.cp_no = B.cp_no
+			and	A.user_no = #{value}
+	</select>
+
+	
+	<select id="selectrecentHotel" resultMap="hotelMap">
+	select
+		rn, HOTEL_NO, HOTEL_NAME, HOTEL_ADDRESS, HOTEL_CONTENTS,
+		HOTEL_TEL, HOTEL_GRADE, HOTEL_STAR, ROOM_COUNT, CP_NO, HOTEL_IMG,
+		HOTEL_LOCATIONLAT, HOTEL_LOCATIONLNG, HOTEL_ADDRESS_DETAIL,
+		HOTEL_OWNER, HOTEL_PHONE
+	from (
+		SELECT
+			row_number() over (order by hotel_no desc) rn, HOTEL_NO, HOTEL_NAME, HOTEL_ADDRESS,
+			HOTEL_CONTENTS, HOTEL_TEL, HOTEL_GRADE, HOTEL_STAR, ROOM_COUNT, CP_NO,
+			HOTEL_IMG, HOTEL_LOCATIONLAT, HOTEL_LOCATIONLNG, HOTEL_ADDRESS_DETAIL,
+			HOTEL_OWNER, HOTEL_PHONE
+		FROM HOTEL
+		order by hotel_no desc)
+	where rn &lt; 4
+	</select>
+	
+	<select id="searchAllHotelList"  resultMap="hotelMap">
+		select 
+			hotel_no, 
+			hotel_name, 
+			hotel_address, 
+			hotel_locationlat, 
+			hotel_locationlng, 
+			hotel_contents, 
+			hotel_tel, 
+			hotel_grade, 
+			hotel_star, 
+			room_count, 
+			cp_no, hotel_img, 
+			hotel_address_detail, 
+			hotel_owner, 
+			hotel_phone 
+		from
+		Hotel
+	</select>
+	
+	
+	<select id="searchhotelall" parameterType="map" resultType="daummap">
+		select  DISTINCT
+			H.hotel_name as name,
+			H.hotel_locationlat as lag,
+			H.hotel_locationlng as lon,
+			H.hotel_img as img,
+			C.cp_type as type
+		from hotel H, company C
+		WHERE h.cp_no = c.cp_no
+		and H.hotel_locationlat >= #{lowLat} and H.hotel_locationlat &lt;= #{highLat} 
+		and H.hotel_locationlng >= #{lowLon} and H.hotel_locationlng &lt;= #{highLon} 
+		
+	</select>
+	
+	
+	<select id="searchByname" parameterType="String" resultMap="hotelMap">
+	select 
+			hotel_no, 
+			hotel_name, 
+			hotel_address, 
+			hotel_locationlat, 
+			hotel_locationlng, 
+			hotel_contents, 
+			hotel_tel, 
+			hotel_grade, 
+			hotel_star, 
+			room_count, 
+			cp_no, hotel_img, 
+			hotel_address_detail, 
+			hotel_owner, 
+			hotel_phone 
+		from
+		Hotel
+		where hotel_name like '%' || #{value} || '%'
+	</select>
+	
+</mapper>

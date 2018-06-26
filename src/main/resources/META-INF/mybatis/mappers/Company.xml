@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.CompanyDao">
+
+	<insert id="addCompany" parameterType="Company">
+		insert into company(cp_no, user_no, company_name, company_status, cp_type)
+		values(#{cpNo}, #{userNo}, #{cpName}, 'N', #{cpType})
+	</insert>
+	
+	<update id="deleteCompany" parameterType="int">
+		update
+			company
+		set
+			company_status = 'F'
+		where
+			cp_no = #{value}
+	</update>
+	
+	<select id="getCompanyByCpNo" parameterType="int" resultType="Company">
+		select
+			cp_no			cpNo,
+			user_no			userNo,
+			company_name	cpName,
+			company_status	cpStatus,
+			cp_type			cpType
+		from
+			company
+		where
+			cp_no = #{value}
+	</select>
+	
+	<select id="allCompany" resultType="Company">
+		select
+			cp_no			cpNo,
+			user_no			userNo,
+			company_name	cpName,
+			company_status	cpStatus,
+			cp_type			cpType
+		from
+			company
+	</select>
+	
+	<select id="getCpNo" parameterType="int" resultType="Company">
+		select
+			cp_no			cpNo
+			, company_name	cpName
+		from
+			company
+		where
+			user_no = #{value}
+	</select>
+	
+	<select id="getAllCompany" parameterType="Pagination" resultType="CompanyForm">
+		select
+			rn, cpNo, userNo, cpName, cpStatus, cpType, userId
+		from
+			(select
+				row_number() over(order by C.cp_no desc) rn
+				, C.cp_no			cpNo
+				, C.user_no			userNo
+				, C.company_name	cpName
+				, C.company_status	cpStatus
+				, C.cp_type			cpType
+				, U.user_id			userId
+			from
+				company C, customer_user U
+			where
+				C.user_no = U.user_no
+			order by
+				C.cp_no desc)
+		where
+			rn >= #{count}*10 and rn &lt;= (#{count}*10+10)
+	</select>
+	
+	<select id="getAllCountByCompany" resultType="int">
+		select
+			count(*)
+		from
+			company C, customer_user U
+		where
+			C.user_no = U.user_no
+	</select>
+	
+	<select id="getCompanyByStatus" parameterType="Pagination" resultType="CompanyForm">
+		select
+			rn, cpNo, userNo, cpName, cpStatus, cpType, userId
+		from
+			(select
+				row_number() over(order by C.cp_no desc) rn
+				, C.cp_no			cpNo
+				, C.user_no			userNo
+				, C.company_name	cpName
+				, C.company_status	cpStatus
+				, C.cp_type			cpType
+				, U.user_id			userId
+			from
+				company C, customer_user U
+			where
+				C.user_no = U.user_no
+				and C.company_status = #{status}
+			order by
+				C.cp_no desc)
+		where
+			rn >= #{count}*10 and rn &lt;= (#{count}*10+10)
+	</select>
+	
+	<select id="getCountByCompanyStatus" parameterType="string" resultType="int">
+		select
+			count(*)
+		from
+			company C, customer_user U
+		where
+			C.user_no = U.user_no
+			and C.company_status = #{value}
+	</select>
+	
+	<update id="updateStatusCompany" parameterType="map">
+		update
+			company
+		set
+			company_status = #{status}
+		where
+			cp_no = #{cpNo}
+	</update>
+	
+</mapper>

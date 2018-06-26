@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.ReviewDao">
+
+	<insert id="insertReview" parameterType="Review">
+		insert into review (review_no, review_content, review_grade, review_Date, user_no, cp_no)
+		values (review_seq.nextval, #{content},#{grade},sysdate,#{userNo},#{cpNo})
+	</insert>
+	
+	<select id="countReview" parameterType="int" resultType="int">
+		select count(*) from review where cp_no = #{value}
+	</select>
+	
+	<select id="avgGrade" parameterType="int" resultType="float">
+		select nvl(avg(review_grade), 0) from review where CP_NO = #{value}
+	</select>
+	<select id="selectReview" parameterType="reviewCriteria" resultType="Review">
+	select rn, no, content, grade, reviewdate, userNo, cpNo, name from (select row_number() over(order by r.review_Date desc) rn,
+			r.review_no as no, 
+			r.review_content as content, 
+			r.review_grade as grade, 
+			r.review_Date as reviewdate, 
+			r.user_no as userNo, 
+			r.cp_no as cpNo,
+			c.user_id as name
+		from review r, customer_user c where cp_no = #{no} and r.user_no = c.user_no
+		order by r.review_Date desc) 
+	where rn > #{count}*6 and rn &lt;= (#{count}*6+6) 
+	</select>
+	
+	<delete id="deleteReview" parameterType="int">
+		delete
+		from review
+		where review_no = #{value}
+	</delete>
+	
+	<update id="updateReview" parameterType="Review">
+		update review
+		set review_content = #{content}, review_grade = #{grade}
+		where review_no = #{no}
+	</update>
+</mapper>

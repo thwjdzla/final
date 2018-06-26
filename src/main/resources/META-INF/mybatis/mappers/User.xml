@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.UserDao">
+
+	<resultMap type="User" id="UserMap">
+		<id property="no" column="user_no"/>
+		<result property="id" column="user_id"/>
+		<result property="pwd" column="user_pwd"/>
+		<result property="email" column="user_email"/>
+		<result property="type" column="user_type"/>
+		<result property="name" column="user_name"/>
+		<result property="sexcode" column="user_sexcode"/>
+		<result property="phone" column="user_phone"/>
+		<result property="birthday" column="user_birthday"/>
+		<result property="zip" column="user_zip"/>
+		<result property="address" column="user_address"/>
+		<result property="emailreceipt" column="user_emailreceipt"/>
+		<result property="smsreceipt" column="user_smsreceipt"/>
+		<result property="status" column="user_status"/>
+		<result property="totalPrice" column="total_price"/>
+		<result property="totalPoint" column="total_point"/>
+		<result property="createDate" column="create_date"/>
+	</resultMap>
+
+	<select id="getUserByPaNo" parameterType="int" resultMap="UserMap">
+		select
+			U.user_no
+			, U.user_id
+			, U.user_pwd
+			, U.user_email
+			, U.user_type
+			, U.user_name
+			, U.user_sexcode
+			, U.user_phone
+			, U.user_birthday
+			, U.user_zip
+			, U.user_address
+			, U.user_emailreceipt
+			, U.user_smsreceipt
+			, U.user_status
+			, U.total_price
+			, U.total_point
+			, U.create_date
+		from
+			package_applicant A, customer_user U
+		where
+			A.user_no = U.user_no
+			and A.pa_no = #{value}
+	</select>
+	
+	<select id="getUserByNo" parameterType="int" resultMap="UserMap">
+		select
+			user_no
+			, user_id
+			, user_pwd
+			, user_email
+			, user_type
+			, user_name
+			, user_sexcode
+			, user_phone
+			, user_birthday
+			, user_zip
+			, user_address
+			, user_emailreceipt
+			, user_smsreceipt
+			, user_status
+			, total_price
+			, total_point
+			, create_date
+		from
+			customer_user
+		where
+			user_no = #{value}
+	</select>
+	
+	<select id="getAllUserCount" parameterType="string" resultType="int">
+		select
+			count(*)
+		from
+			customer_user
+		where
+			user_type = #{value}
+	</select>
+
+	<select id="getAllUsersByType" parameterType="Pagination" resultMap="UserMap">
+		select
+			rn, user_no, user_id, user_pwd, user_email, user_type, user_name, user_sexcode
+			, user_phone, user_birthday, user_zip, user_address, user_emailreceipt, user_smsreceipt
+			, user_status, total_price, total_point, create_date
+		from
+			(select
+				row_number() over(order by user_no desc) rn
+				, user_no
+				, user_id
+				, user_pwd
+				, user_email
+				, user_type
+				, user_name
+				, user_sexcode
+				, user_phone
+				, user_birthday
+				, user_zip
+				, user_address
+				, user_emailreceipt
+				, user_smsreceipt
+				, user_status
+				, total_price
+				, total_point
+				, create_date
+			from
+				customer_user
+			where
+				user_type = #{type}
+			order by
+				user_no desc)
+		where
+			rn > #{count}*10 and rn &lt;= (#{count}*10+10)
+	</select>
+	
+	<select id="getDetailUser" parameterType="Map" resultMap="UserMap">
+		select
+			user_no
+			, user_id
+			, user_pwd
+			, user_email
+			, user_type
+			, user_name
+			, user_sexcode
+			, user_phone
+			, user_birthday
+			, user_zip
+			, user_address
+			, user_emailreceipt
+			, user_smsreceipt
+			, user_status
+			, total_price
+			, total_point
+			, create_date
+		from
+			customer_user
+		<include refid="detail_search"></include>
+	</select>
+	
+	<sql id="detail_search">
+		<where>
+			<if test="no != ''">
+				user_no = #{no}
+			</if>
+			<if test="id != ''">
+				and user_id = #{id}
+			</if>
+		</where>
+	</sql>
+	
+	<update id="updateStatus" parameterType="Map">
+		update
+			customer_user
+		<set>
+			<if test='status != null and status == "S"'>
+				user_status = '정지',
+			</if>
+			<if test='status != null and status == "W"'>
+				user_status = '탈퇴',
+			</if>
+			<if test='status != null and status == "N"'>
+				user_status = '정상'
+			</if>
+		</set>
+		where
+			user_no = #{no}
+	</update>
+	
+	<!-- 소정 -->
+	<insert id="addUser" parameterType="User">
+		insert into customer_user
+			(user_no
+			, user_id
+			, user_pwd
+			, user_email
+			, user_type
+			, user_name
+			, user_sexcode
+			, user_phone
+			, user_birthday
+			, user_zip
+			, user_address
+			, user_emailreceipt
+			, user_smsreceipt
+			, create_date)
+		values
+			(customer_user_seq.nextval, #{id}, #{pwd}, #{email}, #{type}, #{name}, #{sexcode}, #{phone}, #{birthday}, #{zip}, #{address}, #{emailreceipt}, #{smsreceipt}, sysdate)
+	</insert>
+	
+	<select id="searchById" parameterType="string" resultMap="UserMap">
+		select
+			user_id
+		from
+			customer_user
+		where
+			user_id = #{value}
+	</select>
+	
+	<!-- 소정 -->
+	
+	<update id="updateUser" parameterType="User">
+		update customer_user
+		set 
+			user_id = #{id}
+			, user_pwd = #{pwd}
+			, user_email = #{email}
+			, user_sexcode = #{sexcode}
+			, user_phone = #{phone}
+			, user_birthday = #{birthday}
+			, user_zip = #{zip}
+			, user_address = #{address}
+			, user_emailreceipt = #{emailreceipt}
+			, user_smsreceipt = #{smsreceipt}
+		where user_no = #{no}
+	</update>
+	
+	<update id="dropuser" parameterType="int">
+		update customer_user
+		set	
+			user_status = '탈퇴'
+		where user_no = #{no}
+	</update>
+	
+	<update id="reserveDataUpdate" parameterType="hashmap">
+		update
+			customer_user
+		set
+			total_price = #{totalPrice},
+			total_point = #{totalPoint}
+		where 
+			user_no = #{userNo}	 
+	</update>
+	
+	
+</mapper>

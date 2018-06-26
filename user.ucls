@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.2.2" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
+  <package id="1" language="java" name="kr.co.hta.fp.controllers" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/controllers" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="270" y="332"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="2" language="java" name="kr.co.hta.fp.dao" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/dao" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="789" y="332"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="3" language="java" name="kr.co.hta.fp.service" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/service" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="531" y="332"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="4" language="java" name="kr.co.hta.fp.vo" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/vo" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="313" y="530"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="5" language="java" name="kr.co.hta.fp.advice" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/advice" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="849" y="193"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="6" language="java" name="kr.co.hta.fp.annotation" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/annotation" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="150" y="256"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="7" language="java" name="kr.co.hta.fp.exception" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/exception" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="719" y="98"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="8" language="java" name="kr.co.hta.fp.form" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/form" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="758" y="530"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="9" language="java" name="kr.co.hta.fp.interceptors" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/interceptors" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="327" y="94"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="10" language="java" name="kr.co.hta.fp.resolvers" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/resolvers" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="151" y="144"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="11" language="java" name="kr.co.hta.fp.utils" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/utils" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="380" y="193"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="12" language="java" name="kr.co.hta.fp.views" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/views" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="599" y="190"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <class id="13" language="java" name="kr.co.hta.fp.controllers.MyPageController" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/controllers/MyPageController.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="351" width="299" x="944" y="45"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <interface id="14" language="java" name="kr.co.hta.fp.service.AdvertisementApplyService" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/service/AdvertisementApplyService.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1413" y="217"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="15" language="java" name="kr.co.hta.fp.service.AdvertisementApplyServiceImpl" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/service/AdvertisementApplyServiceImpl.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1759" y="207"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <interface id="16" language="java" name="kr.co.hta.fp.dao.AdvertisementApplyDao" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/dao/AdvertisementApplyDao.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="2080" y="210"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="17" language="java" name="kr.co.hta.fp.vo.AdvertisementApply" project="final-project" 
+    file="/final-project/src/main/java/kr/co/hta/fp/vo/AdvertisementApply.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="2003" y="392"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <dependency id="18">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="3"/>  
+  </dependency>  
+  <dependency id="19">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="8"/>  
+  </dependency>  
+  <dependency id="20">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="21">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="8"/>  
+  </dependency>  
+  <dependency id="22">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="7"/>  
+  </dependency>  
+  <dependency id="23">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="2"/>  
+  </dependency>  
+  <association id="24">    
+    <end type="SOURCE" refId="15" navigable="false">      
+      <attribute id="25" name="advertisementApplyDao"/>      
+      <multiplicity id="26" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="16" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="27">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="11"/>  
+  </dependency>  
+  <dependency id="28">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="6"/>  
+  </dependency>  
+  <dependency id="29">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="8"/>  
+  </dependency>  
+  <dependency id="30">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="7"/>  
+  </dependency>  
+  <association id="31">    
+    <end type="SOURCE" refId="13" navigable="false">      
+      <attribute id="32" name="advertisementApplyService"/>      
+      <multiplicity id="33" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="14" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="34">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="14"/>  
+  </realization>  
+  <dependency id="35">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="36">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="12"/>  
+  </dependency>  
+  <dependency id="37">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="38">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="39">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="11"/>  
+  </dependency>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    sort-features="false" accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true" static="true"/>    
+    <operations public="true" package="true" protected="true" private="true" static="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

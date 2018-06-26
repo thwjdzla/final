@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.SiteDao">
+	<resultMap type="Site" id="siteMap">
+		<result property="image" column="rs_image"/>
+		<result property="cpNo" column="cp_no"/>
+		<result property="url" column="rs_url"/>
+		<result property="name" column="rs_name"/>
+		<result property="contents" column="rs_contents"/>
+		<result property="locationLat" column="locationLat"/>
+		<result property="locationLng" column="locationLng"/>
+	</resultMap>
+	
+	<select id="selectSite" parameterType="int" resultMap="siteMap">
+		select * from recommend_site where cp_no = #{no}
+	</select>
+	
+	<insert id="addSite" parameterType="Site">
+		insert into recommend_site
+		values (#{image},#{url},#{name},#{contents},#{locationLat},#{locationLng},#{cpNo})
+	</insert> 
+	
+	<delete id="deleteSite" parameterType="hashmap">
+		delete from recommend_site where rs_url = #{url} and cp_no = #{no}
+	</delete>
+</mapper>

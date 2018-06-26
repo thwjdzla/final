@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+	</settings>
+	
+	<!-- 예시: <typeAlias alias="Book" type="kr.co.hta.board.vo.Book"/> -->
+
+	<typeAliases>
+		<typeAlias alias="daummap" type="kr.co.hta.fp.vo.DaumMap"/>
+		<typeAlias alias="Hotel" type="kr.co.hta.fp.vo.hotel.Hotel"/>
+		<typeAlias alias="Advertisement" type="kr.co.hta.fp.vo.Advertisement"/>
+		<typeAlias alias="User" type="kr.co.hta.fp.vo.User"/>
+		<typeAlias alias="Site" type="kr.co.hta.fp.vo.Site"/>
+		<typeAlias alias="Concert" type="kr.co.hta.fp.vo.concert.Concert"/>
+		<typeAlias alias="Resort" type="kr.co.hta.fp.vo.resort.Resort"/>
+		<typeAlias alias="Advertisement" type="kr.co.hta.fp.vo.Advertisement"/>
+		<typeAlias alias="AdvertisementApply" type="kr.co.hta.fp.vo.AdvertisementApply"/>
+		<typeAlias alias="User" type="kr.co.hta.fp.vo.User"/>
+		<typeAlias alias="Site" type="kr.co.hta.fp.vo.Site"/>
+		<typeAlias alias="Reserve" type="kr.co.hta.fp.vo.Reserve"/>		
+		<typeAlias alias="Review" type="kr.co.hta.fp.vo.board.Review"/>
+		<typeAlias alias="Company" type="kr.co.hta.fp.vo.Company"/>
+		<typeAlias alias="Package" type="kr.co.hta.fp.vo.Package"/>
+		<typeAlias alias="Wishlist" type="kr.co.hta.fp.vo.Wishlist"/>
+		<typeAlias alias="PackageApplicant" type="kr.co.hta.fp.vo.PackageApplicant"/>
+		<typeAlias alias="PackageReceiver" type="kr.co.hta.fp.vo.PackageReceiver"/>
+		<typeAlias alias="ConcertListForm" type="kr.co.hta.fp.form.ConcertListForm"/>
+		<typeAlias alias="HotelListForm" type="kr.co.hta.fp.form.HotelListForm"/>
+		<typeAlias alias="ResortListForm" type="kr.co.hta.fp.form.ResortListForm"/>
+		<typeAlias alias="ConcertItemForm" type="kr.co.hta.fp.form.ConcertItemForm"/>
+		<typeAlias alias="ResortItemForm" type="kr.co.hta.fp.form.ResortItemForm"/>
+		<typeAlias alias="HotelItemForm" type="kr.co.hta.fp.form.HotelItemForm"/>
+		<typeAlias alias="SiteForm" type="kr.co.hta.fp.form.SiteForm"/>
+		<typeAlias alias="ConcertItem" type="kr.co.hta.fp.vo.concert.ConcertItem"/>
+		<typeAlias alias="ResortItem" type="kr.co.hta.fp.vo.resort.ResortItem"/>
+		<typeAlias alias="HotelItem" type="kr.co.hta.fp.vo.hotel.HotelItem"/>
+		<typeAlias alias="HotelItemOption" type="kr.co.hta.fp.vo.hotel.HotelItemOption"/>
+		<typeAlias alias="ReviewCriteria" type="kr.co.hta.fp.form.ReviewCriteria"/>
+		<typeAlias alias="FAQ" type="kr.co.hta.fp.vo.board.FAQ"/>
+		<typeAlias alias="Question" type="kr.co.hta.fp.vo.board.Question"/>
+		<typeAlias alias="QuestionForm" type="kr.co.hta.fp.form.QuestionForm"/>
+		<typeAlias alias="Answer" type="kr.co.hta.fp.vo.board.Answer"/>
+		<typeAlias alias="AdminQuestion" type="kr.co.hta.fp.vo.board.AdminQuestion"/>
+		<typeAlias alias="AdminAnswer" type="kr.co.hta.fp.vo.board.AdminAnswer"/>
+		<typeAlias alias="ItemForm" type="kr.co.hta.fp.form.ItemForm"/>
+		<typeAlias alias="CompanyForm" type="kr.co.hta.fp.form.CompanyForm"/>
+		<typeAlias alias="ReserveStringForm" type="kr.co.hta.fp.form.ReserveStringForm"/>
+		<typeAlias alias="PackageForm" type="kr.co.hta.fp.form.PackageForm"/>
+		<typeAlias alias="Pagination" type="kr.co.hta.fp.vo.Pagination"/>
+	</typeAliases>
+
+	
+</configuration>

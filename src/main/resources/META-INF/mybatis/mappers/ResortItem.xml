@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.ResortItemDao">
+
+	<resultMap type="ResortItem" id="ResortItemMap">
+		<id property="no" column="resort_item_no"/>
+		<result property="name" column="resort_item_name"/>
+		<result property="type" column="resort_item_type"/>
+		<result property="price" column="resort_item_price"/>
+		<result property="count" column="resort_item_count"/>
+		<result property="status" column="resort_item_status"/>
+		<result property="img" column="resort_item_img"/>
+		<result property="rsNo" column="resort_no"/>
+	</resultMap>
+	
+		<select id="getResortItemsByNo" parameterType="int" resultType="ItemForm">
+		select
+			I.resort_item_no			as no
+			, I.resort_item_name		as name
+			, I.resort_item_type		as type
+			, I.resort_item_price		as price
+			, I.resort_item_count		as count
+			, I.resort_item_status		as status
+			, I.resort_item_img			as img
+			, I.resort_no				as rsNo
+			, C.company_name			as companyName
+		from
+			resort_item I, resort R, company C, customer_user U
+		where
+			I.resort_no = R.resort_no
+			and R.cp_no = C.cp_no
+			and C.user_no = U.user_no
+			and C.company_status = 'Y'
+			and U.user_no = #{value}
+	</select>
+	
+	<select id="getResortItemByNo" parameterType="int" resultMap="ResortItemMap">
+		select
+			resort_item_no
+			, resort_item_name
+			, resort_item_type
+			, resort_item_price
+			, resort_item_count
+			, resort_item_status
+			, resort_item_img
+			, resort_no
+		from
+			resort_item
+		where
+			resort_item_no = #{value}
+	</select>
+
+	<select id="getResortItemList" parameterType="int" resultType="ResortItemForm">
+		select
+			A.cp_no					cpNo,
+			A.user_no				userNo,
+			A.company_name			cpName,
+			A.company_status		cpStatus,
+			A.cp_type				cpType,
+			B.resort_no				rsNo,
+			B.resort_name			rsName,
+			B.resort_address		rsAddress,
+			<!-- B.resort_location		rsLocation, -->
+			B.resort_tel			rsTel,
+			B.resort_grade			rsGrade,
+			B.resort_img			rsImg,
+			B.resort_owner			rsOwner,
+			B.resort_content		rsContent,
+			B.resort_phone			rsPhone,
+			B.resort_address_detail	rsAddressDetail,
+			C.resort_item_no		riNo,
+			C.resort_item_name		riName,
+			C.resort_item_type		riType,
+			C.resort_item_price		riPrice,
+			C.resort_item_count		riCount,
+			C.resort_item_status	riStatus,
+			C.resort_item_img		rriImg
+		from 
+			company A, resort B, resort_item C
+		where
+			A.cp_no = B.cp_no
+			and B.resort_no = C.resort_no
+			<!-- and A.CP_TYPE = 'R' -->
+			and A.cp_no = #{value}
+	</select>	
+	
+	<insert id="addResortItem" parameterType="ResortItem">
+		insert into resort_item
+			(resort_item_no,
+			 resort_item_name,
+			 resort_item_type,
+			 resort_item_price,
+			 resort_item_count,
+			 resort_item_status,
+			 resort_item_img,
+			 resort_no)
+		values
+			(resort_item_seq.nextval, #{name}, #{type}, #{price}, #{count}, '판매중', #{img}, #{rsNo})
+	</insert>
+	
+	<select id="getResortItemQty" parameterType="int" resultType="int">
+		select 
+			resort_item_count
+		from
+			resort_item
+		where
+			resort_item_no = #{value}
+	</select>
+	
+	<select id="getResortItemByCpNo" parameterType="int" resultMap="ResortItemMap">
+		select
+			resort_item_no
+			, resort_item_name
+			, resort_item_type
+			, resort_item_price
+			, resort_item_count
+			, resort_item_status
+			, resort_item_img
+			, resort_no
+		from
+			resort_item
+		where
+			resort_no = #{value}
+	</select>
+	
+	<update id="delResortItem" parameterType="int">
+		update
+			resort_item
+		set
+			resort_item_status = 'DELETE'
+		where
+			resort_item_no = #{value}
+	</update>
+	
+	<select id="allResortItemName" resultType="ResortItem">
+		select
+			distinct resort_item_name name
+		from
+			resort_item
+	</select>
+	
+	<update id="updateResortItem" parameterType="ResortItem">
+		update
+			resort_item
+		<set>
+			resort_item_name = #{name},
+			resort_item_type = #{type},
+			resort_item_price = #{price},
+			resort_item_count = #{count}
+			<if test="img != null">
+			,resort_item_img = #{img}
+			</if>
+		</set>
+		where
+			resort_item_no = #{no}
+	</update>
+</mapper>

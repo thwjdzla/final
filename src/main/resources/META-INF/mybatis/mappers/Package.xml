@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.PackageDao">
+
+	<resultMap type="PackageApplicant" id="PackageApplicantMap">
+		<id property="no" column="pa_no"/>
+		<result property="title" column="pa_title"/>
+		<result property="content" column="pa_content"/>
+		<result property="userNo" column="user_no"/>
+		<result property="startDate" column="pa_start_date"/>
+		<result property="endDate" column="pa_end_date"/>
+		<result property="packageCount" column="pa_package_count"/>
+		<result property="dfboc" column="pa_dfboc"/>
+		<result property="hotelItemNo" column="hotel_item_no"/>
+		<result property="concertItemNo" column="concert_item_no"/>
+		<result property="resortItemNo" column="resort_item_no"/>
+		<result property="createDate" column="create_date"/>
+		<result property="packageRate" column="pa_package_rate"/>
+		<result property="ruNo" column="receiver_user_no"/>
+		<result property="status" column="pa_status"/>
+		<result property="userId" column="user_id"/>
+	</resultMap>
+	
+	<resultMap type="PackageReceiver" id="PackageReceiverMap">
+		<id property="no" column="pr_no"/>
+		<result property="userNo" column="user_no"/>
+		<result property="hotelItemNo" column="hotel_item_no"/>
+		<result property="concertItemNo" column="concert_item_no"/>
+		<result property="resortItemNo" column="resort_item_no"/>
+		<result property="paNo" column="pa_no"/>
+		<result property="userId" column="user_id"/>
+		<result property="status" column="pr_status"/>
+		<result property="createDate" column="create_date"/>
+	</resultMap>
+	
+	<update id="cancleFromPa" parameterType="int">
+		update
+			package_applicant
+		set
+			pa_status = 'C'
+		where
+			pa_no = #{value}
+	</update>
+	
+	<select id="getPabyPr" parameterType="int" resultMap="PackageReceiverMap">
+		select
+			R.user_id
+			, R.pr_no
+			, R.hotel_item_no
+			, R.concert_item_no
+			, R.resort_item_no
+			, R.pr_status
+			, A.pa_no
+			, R.user_no
+			, R.create_date
+		from
+			package_applicant A, package_receiver R
+		where
+			A.pa_no = R.pa_no
+			and A.pa_no = #{value}
+	</select>
+	
+	<insert id="addPackageApplicant" parameterType="PackageApplicant">
+		insert into package_applicant(pa_no, pa_title, pa_content, user_no, pa_start_date, pa_end_date, pa_package_count
+										, pa_dfboc, hotel_item_no, concert_item_no, resort_item_no, create_date, pa_package_rate
+										, receiver_user_no, pa_status, user_id)
+		values(pa_no_seq.nextval, #{title}, #{content}, #{userNo}, #{startDate}, #{endDate}, #{packageCount}, #{dfboc}, #{hotelItemNo}
+				, #{concertItemNo}, #{resortItemNo}, sysdate, #{packageRate}, #{ruNo}, 'Y', #{userId})
+	</insert>
+	
+	<select id="needContract" parameterType="map" resultType="Package">
+		select
+			A.pa_title				as packageName
+			, A.pa_package_rate		as rate
+			, A.pa_package_count	as count
+			, A.hotel_item_no		as hotelNo
+			, R.resort_item_no		as resortNo
+			, R.concert_item_no		as concertNo
+			, A.pa_start_date		as startDate
+			, A.pa_end_date			as endDate
+			, R.pr_no				as prNo
+			, A.pa_no				as paNo
+			, R.user_no				as userNo
+		from
+			package_applicant A, package_receiver R
+		where
+			A.pa_no = R.pa_no
+			and R.pr_no = #{no}
+	</select>
+	
+	<update id="contractStatus" parameterType="map">
+		update
+			package_applicant
+		set
+			pa_status = 'N'
+			, receiver_user_no = #{userNo}
+		where
+			pa_no = #{paNo}
+	</update>
+	
+	<update id="contractPackageReceiver" parameterType="map">
+		update
+			package_receiver
+		set
+			pr_status = 'N'
+		where
+			pr_no = #{no}
+	</update>
+	
+	<insert id="contractPackage" parameterType="Package">
+		insert into package_item(package_no, package_name, package_rate, package_count, package_start_date, package_end_date
+								, pr_no, pa_no, hotel_item_no, resort_item_no, concert_item_no, package_status)
+		values(package_no_seq.nextval, #{packageName}, #{rate}, #{count}, #{startDate}, #{endDate}, #{prNo}, #{paNo}
+				, #{hotelNo}, #{resortNo}, #{concertNo}, 'Y')
+	</insert>
+	
+	<update id="canclePackageReceiver" parameterType="int">
+		update
+			package_receiver
+		set
+			pr_status = 'C'
+		where
+			pa_no = #{value}
+	</update>
+	
+	<update id="canclePackageApplicant" parameterType="int">
+		update
+			package_applicant
+		set
+			pa_status = 'F'
+		where
+			pa_no = #{value}
+	</update>
+	
+	<update id="canclePackage" parameterType="int">
+		update
+			package_item
+		set
+			package_status = 'N'
+		where
+			pa_no = #{value}
+	</update>
+	
+	<select id="getMyReceiverCount" parameterType="int" resultType="int">
+		select
+			count(*)
+		from
+			package_applicant A, package_receiver R
+		where
+			A.pa_no = R.pa_no
+			and R.user_no = #{value}
+	</select>
+	
+	<select id="getMyPackageReceiverByNo" parameterType="Pagination" resultMap="PackageApplicantMap">
+		select
+			rn, pa_no, pa_title, pa_content, user_no, pa_start_date, pa_end_date
+			, pa_package_count, pa_dfboc, hotel_item_no, concert_item_no, resort_item_no
+			, create_date, pa_package_rate, receiver_user_no, pa_status, user_id, prStatus
+		from
+			(select
+				row_number() over(order by R.pr_no desc) rn
+				, A.pa_no
+				, A.pa_title
+				, A.pa_content
+				, A.user_no
+				, A.pa_start_date
+				, A.pa_end_date
+				, A.pa_package_count
+				, A.pa_dfboc
+				, A.hotel_item_no
+				, A.concert_item_no
+				, A.resort_item_no
+				, A.create_date
+				, A.pa_package_rate
+				, A.receiver_user_no
+				, A.pa_status
+				, A.user_id
+				, R.pr_status	as prStatus
+			from
+				package_applicant A, package_receiver R
+			where
+				A.pa_no = R.pa_no
+				and R.user_no = #{no}
+			order by
+				R.pr_no desc)
+		where
+			rn > #{count}*10 and rn &lt;= (#{count}*10+10)
+	</select>
+	
+	<select id="getMyApplicantCount" parameterType="int" resultType="int">
+		select
+			count(*)
+		from
+			package_applicant
+		where
+			user_no = #{value}
+	</select>
+	
+	<select id="getMyPackageApplicantByNo" parameterType="Pagination" resultMap="PackageApplicantMap">
+		select
+			rn, pa_no, pa_title, pa_content, user_no, pa_start_date, pa_end_date, pa_package_count, pa_dfboc
+			, hotel_item_no, concert_item_no, resort_item_no, create_date, pa_package_rate, receiver_user_no
+			, pa_status, user_id
+		from
+			(select
+				row_number() over(order by pa_no desc) rn
+				, pa_no
+				, pa_title
+				, pa_content
+				, user_no
+				, pa_start_date
+				, pa_end_date
+				, pa_package_count
+				, pa_dfboc
+				, hotel_item_no
+				, concert_item_no
+				, resort_item_no
+				, create_date
+				, pa_package_rate
+				, receiver_user_no
+				, pa_status
+				, user_id
+			from
+				package_applicant
+			where
+				user_no = #{no}
+			order by
+				pa_no desc)
+		where
+			rn > #{count}*5 and rn &lt;= (#{count}*5+5)
+	</select>
+	
+	<select id="getPackageReceiverBypaNo" parameterType="int" resultMap="PackageReceiverMap">
+		select
+			pr_no
+			, user_no
+			, hotel_item_no
+			, concert_item_no
+			, resort_item_no
+			, pa_no
+			, user_id
+			, pr_status
+		from
+			package_receiver
+		where
+			pa_no = #{value}
+	</select>
+	
+	<insert id="submitPackageReceiver" parameterType="PackageReceiver">
+		insert into package_receiver (pr_no, user_no, hotel_item_no, concert_item_no, resort_item_no, pa_no, user_id, pr_status)
+		values (pr_no_seq.nextval, #{userNo}, #{hotelItemNo}, #{concertItemNo}, #{resortItemNo}, #{paNo}, #{userId}, 'Y')
+	</insert>
+
+	<select id="getPackageListCount" resultType="int">
+		select
+			count(*)
+		from
+			package_applicant
+	</select>
+
+	<select id="getPackageBoardList" resultMap="PackageApplicantMap">
+		select
+			rn, pa_no, pa_title, pa_content, user_no, pa_start_date, pa_end_date
+			, pa_package_count, pa_dfboc, hotel_item_no, concert_item_no, resort_item_no
+			, create_date, pa_package_rate, receiver_user_no, pa_status, user_id
+		from
+			(select
+				row_number() over(order by pa_no desc) rn
+				, pa_no
+				, pa_title
+				, pa_content
+				, user_no
+				, pa_start_date
+				, pa_end_date
+				, pa_package_count
+				, pa_dfboc
+				, hotel_item_no
+				, concert_item_no
+				, resort_item_no
+				, create_date
+				, pa_package_rate
+				, receiver_user_no
+				, pa_status
+				, user_id
+			from
+				package_applicant
+			order by
+				pa_no desc)
+		where
+			rn > #{count}*10 and rn &lt;= (#{count}*10+10)
+	</select>
+	
+	<select id="selectPackageByNo" parameterType="int" resultType="Package">
+		SELECT 
+			PACKAGE_NO packageNo, 
+			PACKAGE_NAME packageName, 
+			PACKAGE_RATE rate, 
+			PACKAGE_COUNT count, 
+			HOTEL_ITEM_NO hotelNo, 
+			PACKAGE_START_DATE startDate, 
+			PACKAGE_END_DATE endDate, 
+			RESORT_ITEM_NO resortNo, 
+			CONCERT_ITEM_NO concertNo
+		FROM PACKAGE_ITEM
+		where package_no = #{value}
+	</select>
+	
+	<select id="getPackageApplicant" parameterType="int" resultMap="PackageApplicantMap">
+		select
+			pa_no
+			, pa_title
+			, pa_content
+			, user_no
+			, pa_start_date
+			, pa_end_date
+			, pa_package_count
+			, pa_dfboc
+			, hotel_item_no
+			, concert_item_no
+			, resort_item_no
+			, create_date
+			, pa_package_rate
+			, receiver_user_no
+			, pa_status
+			, user_id
+		from
+			package_applicant
+		where
+			pa_no = #{value}
+	</select>
+
+	<select id="getPackagebyHotel" parameterType="int" resultType="Package">
+	select 
+		package_no packageNo, package_name packageName, package_rate rate, package_count count, PACKAGE_START_DATE startDate, PACKAGE_END_DATE endDate
+	from 
+		PACKAGE_ITEM A, HOTEL_ITEM B, HOTEL C 
+	where 
+		A.HOTEL_ITEM_NO = B.HOTEL_ITEM_NO and B.HOTEL_NO = C.HOTEL_NO and C.CP_NO = #{value} and A.RESORT_ITEM_NO is not null
+	union		
+	select 
+		package_no packageNo, package_name packageName, package_rate rate, package_count count, PACKAGE_START_DATE startDate, PACKAGE_END_DATE endDate
+	from 
+		PACKAGE_ITEM A, HOTEL_ITEM B, HOTEL C 
+	where 
+		A.HOTEL_ITEM_NO = B.HOTEL_ITEM_NO and B.HOTEL_NO = C.HOTEL_NO and C.CP_NO = #{value} and A.Concert_ITEM_NO is not null
+	</select>
+	
+	<select id="getPackagebyConcert" parameterType="int" resultType="Package">
+	select 
+		package_no packageNo, package_name packageName, package_rate rate, package_count count, PACKAGE_START_DATE startDate, PACKAGE_END_DATE endDate 
+	from 
+		PACKAGE_ITEM A, RESORT_ITEM B, RESORT C 
+	where 
+		A.RESORT_ITEM_NO = B.RESORT_ITEM_NO and B.RESORT_NO = C.RESORT_NO and C.CP_NO = #{value} and A.HOTEL_ITEM_NO is not null
+	union
+	select 
+		package_no packageNo, package_name packageName, package_rate rate, package_count count, PACKAGE_START_DATE startDate, PACKAGE_END_DATE endDate 
+	from 
+		PACKAGE_ITEM A, RESORT_ITEM B, RESORT C 
+	where 
+		A.RESORT_ITEM_NO = B.RESORT_ITEM_NO and B.RESORT_NO = C.RESORT_NO and C.CP_NO = #{value} and A.Resort_ITEM_NO is not null
+	</select>
+	
+	<select id="getPackagebyResort" parameterType="int" resultType="Package">
+	select 
+		package_no packageNo, package_name packageName, package_rate rate, package_count count, PACKAGE_START_DATE startDate, PACKAGE_END_DATE endDate 
+	from 
+		PACKAGE_ITEM A, CONCERT_ITEM B, CONCERT C 
+	where 
+		A.CONCERT_ITEM_NO = B.CONCERT_ITEM_NO and B.CONCERT_NO = C.CONCERT_NO and C.CP_NO = #{value} and A.HOTEL_ITEM_NO is not null
+	union
+	select 
+		package_no packageNo, package_name packageName, package_rate rate, package_count count, PACKAGE_START_DATE startDate, PACKAGE_END_DATE endDate 
+	from 
+		PACKAGE_ITEM A, CONCERT_ITEM B, CONCERT C 
+	where 
+		A.CONCERT_ITEM_NO = B.CONCERT_ITEM_NO and B.CONCERT_NO = C.CONCERT_NO and C.CP_NO = #{value} and A.Concert_ITEM_NO is not null
+	</select>
+	
+	<select id="getPackageByTypeAndItemNo" parameterType="kr.co.hta.fp.vo.ProductInfoForDate" resultType="Package">
+	select
+		package_no packageNo, package_name packageName, package_rate rate, package_count count, PACKAGE_START_DATE startDate, PACKAGE_END_DATE endDate
+	from
+		PACKAGE_ITEM
+	where
+	<choose>
+		<when test='type == "H"'>
+			HOTEL_ITEM_NO = #{no} and PACKAGE_START_DATE = #{checkIn} and PACKAGE_END_DATE = #{checkOut}
+		</when>
+		<when test='type == "R"'>
+			RESORT_ITEM_NO = #{no} and PACKAGE_START_DATE = #{checkIn} and PACKAGE_END_DATE = #{checkOut}
+		</when>
+		<when test='type == "C"'>
+			CONCERT_ITEM_NO = #{no} and PACKAGE_START_DATE = #{checkIn} and PACKAGE_END_DATE = #{checkOut}
+		</when>
+	</choose>
+	</select>
+	
+	<update id="updatePackageCount" parameterType="hashmap">
+		update
+			PACKAGE_ITEM
+		set
+			package_count = #{count}
+		where
+			package_no = #{pNo}
+	</update>
+	
+	<select id="selectrecentPackage" resultType="PackageForm">
+	select package_no no, to_char(A.package_start_date,'yyyy-MM-dd') startDate, to_char(A.package_end_date,'yyyy-MM-dd') endDate, A.package_name name, C.hotel_img "hotel.img", C.hotel_address_detail "hotel.addressDetail"
+	from PACKAGE_ITEM A, HOTEL_ITEM B, hotel C 
+	where A.HOTEL_ITEM_NO = B.HOTEL_ITEM_NO and B.HOTEL_NO = C.HOTEL_NO and A.PACKAGE_NO in (
+		select no from( 
+			select ROW_NUMBER() over(order by package_no desc) rn, package_no no from (
+				select PACKAGE_NO from PACKAGE_ITEM where HOTEL_ITEM_NO is not null and RESORT_ITEM_NO is not null
+				UNION
+				select PACKAGE_NO from PACKAGE_ITEM where HOTEL_ITEM_NO is not null and concert_ITEM_NO is not null))
+			 where 9 > rn
+	)
+	</select>
+	
+	
+	<select id="searchpackageall" resultType="Package">
+		select
+			package_no as packageNo
+			, package_name as packageName
+			, package_rate as rate
+			, package_count as count
+			, package_start_date as startDate
+			, package_end_date as endDate
+
+			, hotel_item_no as hotelNo
+			, concert_item_no as concertNo
+			, resort_item_no as resortNo
+			, pr_no as prNo
+			, package_status as status
+			, pa_no as paNo
+		from
+			package_item
+		where
+		HOTEL_ITEM_NO is not null
+			and PA_NO is not null
+	</select>
+	
+	
+	<select id="searchPackageByname" parameterType="String" resultType="Package">
+	select 
+			package_no as packageNo
+			, package_name as packageName
+			, package_rate as rate
+			, package_count as count
+			, package_start_date as startDate
+			, package_end_date as endDate
+
+			, hotel_item_no as hotelNo
+			, concert_item_no as concertNo
+			, resort_item_no as resortNo
+			, pr_no as prNo
+			, package_status as status
+			, pa_no as paNo
+		from
+		package_Item
+		where package_name like '%' || #{value} || '%'
+		and package_status = 'Y'
+	</select>
+	
+	
+</mapper>

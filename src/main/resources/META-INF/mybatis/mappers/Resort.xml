@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.ResortDao">
+
+	<resultMap type="Resort" id="ResortMap">
+		<id property="no" column="resort_no"/>
+		<result property="name" column="resort_name"/>
+		<result property="address" column="resort_address"/>
+		<result property="locationLat" column="resort_locationLat"/>
+		<result property="locationLng" column="resort_locationLng"/>
+		<result property="option" column="resort_option"/>
+		<result property="tel" column="resort_tel"/>
+		<result property="grade" column="resort_grade"/>
+		<result property="cpNo" column="cp_no"/>
+		<result property="itemNo" column="item_no"/>
+		<result property="img" column="resort_img"/>
+		<result property="owner" column="resort_owner"/>
+		<result property="phone" column="resort_phone"/>
+		<result property="content" column="resort_content"/>
+		<result property="addressDetail" column="resort_address_detail"/>
+	</resultMap>
+	
+	<update id="updateResort" parameterType="Resort">
+		update
+			resort
+		<set>
+			resort_name	= #{name}
+			, resort_address = #{address}
+			, resort_tel = #{tel}
+			, resort_owner = #{owner}
+			, resort_phone = #{phone}
+			, resort_content = #{content}
+			, resort_address_detail = #{addressDetail}
+			<if test="locationLat != null">
+			, resort_locationlat = #{locationLat}
+			</if>
+			<if test="locationLng != null">
+			, resort_locationlng = #{locationLng}
+			</if>
+			<if test="img != null">
+			, resort_img = #{img}
+			</if>
+		</set>
+		where
+			cp_no = #{cpNo}
+	</update>
+
+	<insert id="submitByResort" parameterType="Resort">
+		insert into resort(resort_no, resort_name, resort_address, resort_locationlat, resort_locationlng, resort_option, resort_tel
+							, resort_grade, cp_no, item_no, resort_img, resort_owner, resort_phone, resort_content
+							, resort_address_detail)
+		values(resort_seq.nextval, #{name}, #{address}, #{locationLat}, #{locationLng}, #{option}, #{tel}, 0, #{cpNo}, 0
+				, #{img}, #{owner}, #{phone}, #{content}, #{addressDetail})
+	</insert>
+	
+	<select id="getResortRegisteredList" parameterType="int" resultType="ResortListForm">
+		select
+			A.cp_no					cpNo,
+			A.user_no				userNo,
+			A.company_name			cpName,
+			A.company_status		cpStatus,
+			A.cp_type				cpType,
+			B.resort_no				no,
+			B.resort_name			name,
+			B.resort_img			img
+		from 
+			company A, resort B
+		where
+			A.cp_no = B.cp_no
+			and A.user_no = #{value}
+	</select>
+	
+	<select id="searchResortByNo" parameterType="int" resultMap="ResortMap">
+		SELECT 
+			RESORT_NO, 
+			RESORT_NAME, 
+			RESORT_ADDRESS, 
+			RESORT_LOCATIONLAT, 
+			RESORT_LOCATIONLNG, 
+			RESORT_OPTION, 
+			RESORT_TEL, 
+			RESORT_GRADE, 
+			CP_NO, 
+			ITEM_NO, 
+			RESORT_IMG, 
+			RESORT_OWNER, 
+			RESORT_CONTENT, 
+			RESORT_PHONE, 
+			RESORT_ADDRESS_DETAIL 
+		FROM RESORT
+		where cp_no = #{value}
+	</select>	
+	
+	<select id="searchResortByRno" parameterType="int" resultMap="ResortMap">
+		SELECT 
+			RESORT_NO, 
+			RESORT_NAME, 
+			RESORT_ADDRESS, 
+			RESORT_LOCATIONLAT, 
+			RESORT_LOCATIONLNG, 
+			RESORT_OPTION, 
+			RESORT_TEL, 
+			RESORT_GRADE, 
+			CP_NO, 
+			ITEM_NO, 
+			RESORT_IMG, 
+			RESORT_OWNER, 
+			RESORT_CONTENT, 
+			RESORT_PHONE, 
+			RESORT_ADDRESS_DETAIL 
+		FROM RESORT
+		where RESORT_NO = #{value}
+	</select>	
+	<select id="selectrecentResort" resultMap="ResortMap">
+	SELECT
+		rn, RESORT_NO, RESORT_NAME, RESORT_ADDRESS, RESORT_OPTION, RESORT_TEL, RESORT_GRADE, CP_NO, ITEM_NO, RESORT_IMG, RESORT_OWNER, RESORT_CONTENT, RESORT_PHONE, RESORT_ADDRESS_DETAIL, RESORT_LOCATIONLAT, RESORT_LOCATIONLNG
+	from	
+		(SELECT 
+			ROW_NUMBER() over (order by resort_no desc) rn, RESORT_NO, RESORT_NAME, RESORT_ADDRESS, RESORT_OPTION, RESORT_TEL, RESORT_GRADE, CP_NO, ITEM_NO, RESORT_IMG, RESORT_OWNER, RESORT_CONTENT, RESORT_PHONE, RESORT_ADDRESS_DETAIL, RESORT_LOCATIONLAT, RESORT_LOCATIONLNG 
+			FROM RESORT
+		)
+	where rn &lt; 4
+	</select>
+	
+	
+	<select id="searchAllResortList"  resultMap="ResortMap">
+		select 
+			RESORT_NO, 
+			RESORT_NAME, 
+			RESORT_ADDRESS, 
+			RESORT_LOCATIONLAT, 
+			RESORT_LOCATIONLNG, 
+			RESORT_OPTION, 
+			RESORT_TEL, 
+			RESORT_GRADE, 
+			CP_NO, 
+			ITEM_NO, 
+			RESORT_IMG, 
+			RESORT_OWNER, 
+			RESORT_CONTENT, 
+			RESORT_PHONE, 
+			RESORT_ADDRESS_DETAIL 
+		from
+		RESORT
+	</select>
+	
+	<select id="searchresortall" parameterType="map" resultType="daummap">
+		select  DISTINCT
+			R.RESORT_NAME as name,
+			R.RESORT_LOCATIONLAT as lag,
+			R.RESORT_LOCATIONLNG as lon,
+			R.RESORT_IMG as img,
+			CA.cp_type as type
+		from RESORT R, company CA
+		WHERE R.cp_no = CA.cp_no
+		and R.RESORT_LOCATIONLAT >= #{lowLat} and R.RESORT_LOCATIONLAT &lt;= #{highLat} 
+		and R.RESORT_LOCATIONLNG >= #{lowLon} and R.RESORT_LOCATIONLNG &lt;= #{highLon} 
+		
+	</select>
+	
+	<select id="searchByname" parameterType="String" resultMap="ResortMap">
+	select 
+			RESORT_NO, 
+			RESORT_NAME, 
+			RESORT_ADDRESS, 
+			RESORT_LOCATIONLAT, 
+			RESORT_LOCATIONLNG, 
+			RESORT_OPTION, 
+			RESORT_TEL, 
+			RESORT_GRADE, 
+			CP_NO, 
+			ITEM_NO, 
+			RESORT_IMG, 
+			RESORT_OWNER, 
+			RESORT_CONTENT, 
+			RESORT_PHONE, 
+			RESORT_ADDRESS_DETAIL
+		from
+		Resort
+		where RESORT_NAME like '%' || #{value} || '%'
+	</select>
+</mapper>

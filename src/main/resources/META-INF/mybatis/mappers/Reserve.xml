@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.ReserveDao">
+	
+	<resultMap type="Reserve" id="ReserveMap">
+		<id property="reserveNo" column="reserve_no"/>
+		<result property="reserveDate" column="reserve_date"/>
+		<result property="checkIn" column="check_in"/>
+		<result property="checkOut" column="check_out"/>
+		<result property="price" column="reserve_price"/>
+		<result property="packageNo" column="package_no"/>
+		<result property="userNo" column="user_no"/>
+		<result property="status" column="reserve_status"/>
+		<result property="usePoint" column="point_use"/>
+		<result property="stackPoint" column="point_stack"/>
+		<result property="request" column="request"/>
+		<result property="reason" column="refund_reason"/>
+	</resultMap>
+	
+	<select id="getUserReserveByNo" resultMap="ReserveMap" parameterType="int">
+		select 
+			reserve_no,
+			reserve_date,
+			check_in,
+			check_out,
+			reserve_price,
+			package_no,
+			user_no,
+			reserve_status,
+			point_use,
+			point_stack,
+			request,
+			refund_reason,
+			qty
+		from
+			reserve
+		where
+			user_no = #{value}
+		order by
+			reserve_no desc
+	</select>
+	
+	<select id="getUserReserveCount" resultType="int" parameterType="hashmap">
+		select 
+			count(*) cnt
+		from
+			reserve
+		where
+			user_no = #{userNo}
+			<choose>
+				<when test='status != "전체"'>
+					AND RESERVE_STATUS = #{status}
+				</when>
+			</choose>
+	</select>
+	
+	<select id="getUserReservePaging" parameterType="hashmap" resultMap="ReserveMap">
+		SELECT
+			RESERVE_NO, 
+			RESERVE_DATE, 
+			CHECK_IN, 
+			CHECK_OUT, 
+			RESERVE_PRICE, 
+			PACKAGE_NO, 
+			USER_NO, 
+			RESERVE_STATUS, 
+			POINT_USE, 
+			POINT_STACK, 
+			REQUEST, 
+			QTY,
+			REFUND_REASON
+		FROM
+			(SELECT
+				ROW_NUMBER() OVER(ORDER BY CHECK_IN DESC) RN,
+				RESERVE_NO, 
+				RESERVE_DATE, 
+				CHECK_IN, 
+				CHECK_OUT, 
+				RESERVE_PRICE, 
+				PACKAGE_NO, 
+				USER_NO, 
+				RESERVE_STATUS, 
+				POINT_USE, 
+				POINT_STACK, 
+				REQUEST, 
+				QTY,
+				REFUND_REASON
+			FROM
+				RESERVE
+			WHERE
+				USER_NO = #{userNo}
+			<choose>
+				<when test='status != "전체"'>
+					AND RESERVE_STATUS = #{status}
+				</when>
+			</choose>
+			)
+		WHERE
+		<![CDATA[
+			rn >= #{min} and rn <= #{max}
+		]]>
+	</select>
+	
+	<select id="getUserReserveByReserveNo" resultMap="ReserveMap" parameterType="int">
+		select 
+			reserve_no,
+			reserve_date,
+			check_in,
+			check_out,
+			reserve_price,
+			package_no,
+			user_no,
+			reserve_status,
+			point_use,
+			point_stack,
+			request,
+			refund_reason,
+			qty
+		from
+			reserve
+		where
+			reserve_no = #{value}
+	</select>
+	
+	<select id="getPackageReserve" parameterType="int" resultType="int">
+		select count(*) from reserve where PACKAGE_NO=#{value}
+	</select>
+	
+	<select id="getItemReserve" parameterType="kr.co.hta.fp.form.ProductInfo" resultType="int">
+			select 
+				count(*) as count
+			from 
+				reserve A,  package_item B
+			where 
+				A.package_no = B.package_no
+				and 
+		<choose>
+			<when test='type == "H"'>
+				hotel_item_no = #{no}
+			</when>
+			<when test='type == "R"'>
+				resort_item_no = #{no}
+			</when>
+			<when test='type == "C"'>
+				concert_item_no = #{no}
+			</when>
+		</choose>
+				and (
+		<![CDATA[
+						(check_in > #{checkIn} and  check_in < #{checkOut})
+						or (check_out > #{checkIn} and  check_out < #{checkOut})
+						or (check_in < #{checkIn} and check_out > #{checkOut})	 
+						or (check_in > #{checkIn} and check_out < #{checkOut})	
+						or (check_in = #{checkIn})
+						or (check_in = #{checkIn} and check_out = #{checkOut})
+						or (check_out = #{checkOut})
+				)
+		]]>
+	</select>
+	
+	<select id="getReserveRank" resultType="ReserveStringForm">
+select A.rn, A.cnt count, A.no packageNo, B.HOTEL_ITEM_NAME|| '/' ||C.HOTEL_NAME packageName from (
+		select rn, cnt, no from( 
+		select row_number() over (order by cnt desc) rn, cnt, HOTEL_ITEM_NO no from (
+			select count(HOTEL_ITEM_NO) cnt, HOTEL_ITEM_NO from RESERVE A, PACKAGE_ITEM B  where to_char(A.check_in,'yyyy') = to_char(sysdate,'yyyy') and A.PACKAGE_NO = B.PACKAGE_NO and HOTEL_ITEM_NO is not null group by hotel_item_no))
+	where 7 > rn) A, hotel_item B, hotel C where B.hotel_item_no = A.no and C.HOTEL_NO = B.hotel_no order by A.rn
+	</select>
+		
+	<insert id="addReserve" parameterType="Reserve">
+		insert into reserve (
+			reserve_no, 
+			reserve_date,
+			check_in,
+			check_out,
+			reserve_price,
+			package_no,
+			user_no,
+			reserve_status,
+			point_use,
+			point_stack,
+			request,
+			qty
+		)
+		values (
+			reserve_seq.nextval,
+			sysdate,
+			#{checkIn},
+			#{checkOut},
+			#{price},
+			#{packageNo},
+			#{userNo},
+			'결제',
+			#{usePoint},
+			#{stackPoint},
+			#{request},
+			#{qty}
+		)
+			
+	</insert>
+	
+	<select id="getUserReserveByDate" parameterType="hashmap" resultMap="ReserveMap">
+		select 
+			reserve_no,
+			reserve_date,
+			check_in,
+			check_out,
+			reserve_price,
+			package_no,
+			user_no,
+			reserve_status,
+			point_use,
+			point_stack,
+			request,
+			refund_reason,
+			qty
+		from
+			reserve
+		where
+		<![CDATA[
+			user_no = #{userNo}
+		and reserve_date >= #{fDate}
+		and reserve_date <= #{lDate}
+		]]>	
+	</select>
+	
+	<select id="getUserMembershipByNo" parameterType="int" resultType="kr.co.hta.fp.vo.Membership">
+		select
+			membership_grade grade,
+			membership_rate rate,
+			membership_point pointRate,
+			user_no userNo
+		from
+			membership
+		where
+			user_no = #{value}
+	</select>
+	<insert id="addMembership" parameterType="int">
+		insert into membership (
+			membership_grade, 
+			membership_rate, 
+			membership_point, 
+			user_no
+		)
+		values (
+			'브론즈',
+			5,
+			1,
+			#{value}
+		)
+	</insert>
+	
+	<update id="updateMembership" parameterType="hashmap">
+		update
+			membership
+		set
+			membership_grade = #{grade},
+			membership_rate = #{rate},
+			membership_point = #{point}
+		where
+			user_no = #{userNo}
+	</update>
+	
+	<update id="updateReserveStatus" parameterType="hashmap">
+		update
+			reserve
+		set
+			reserve_status = #{status},
+			refund_reason = #{reason}
+		where
+			user_no = #{userNo}
+		and	reserve_no = #{reserveNo}
+	</update>
+	
+	<select id="getCompanyReserveList" parameterType="hashmap" resultMap="ReserveMap">
+		SELECT
+			RESERVE_NO, 
+			RESERVE_DATE, 
+			CHECK_IN, 
+			CHECK_OUT, 
+			RESERVE_PRICE, 
+			PACKAGE_NO, 
+			USER_NO, 
+			RESERVE_STATUS, 
+			POINT_USE, 
+			POINT_STACK, 
+			REQUEST, 
+			QTY,
+			REFUND_REASON
+		FROM
+			RESERVE
+		WHERE
+			PACKAGE_NO in (
+				<choose>
+					<when test='type == "H"'>
+					SELECT
+						PACKAGE_NO
+					FROM
+						PACKAGE_ITEM
+					WHERE
+						HOTEL_ITEM_NO in (
+										  SELECT
+										  	HOTEL_ITEM_NO
+										  FROM
+										   	HOTEL_ITEM
+										  WHERE
+										   	HOTEL_NO = #{no}
+										 )
+					</when>
+					<when test='type == "C"'>
+					SELECT
+						PACKAGE_NO
+					FROM
+						PACKAGE_ITEM
+					WHERE
+						CONCERT_ITEM_NO in (
+										  SELECT
+										  	CONCERT_ITEM_NO
+										  FROM
+										   	CONCERT_ITEM
+										  WHERE
+										   	CONCERT_NO = #{no}
+										 )
+					</when>
+					<when test='type == "R"'>
+					SELECT
+						PACKAGE_NO
+					FROM
+						PACKAGE_ITEM
+					WHERE
+						RESORT_ITEM_NO in (
+										  SELECT
+										  	RESORT_ITEM_NO
+										  FROM
+										   	RESORT_ITEM
+										  WHERE
+										   	RESORT_NO = #{no}
+										 )
+					</when>
+				</choose>
+			)
+		ORDER BY
+			CHECK_IN desc
+	</select>
+	
+	<select id="getCompanyReserveCount" parameterType="hashmap" resultType="int">
+		SELECT
+			COUNT(*) cnt
+		FROM
+			RESERVE
+		WHERE
+			PACKAGE_NO in (
+				<choose>
+					<when test='type == "H"'>
+					SELECT
+						PACKAGE_NO
+					FROM
+						PACKAGE_ITEM
+					WHERE
+						HOTEL_ITEM_NO in (
+										  SELECT
+										  	HOTEL_ITEM_NO
+										  FROM
+										   	HOTEL_ITEM
+										  WHERE
+										   	HOTEL_NO = #{no}
+										 )
+					</when>
+					<when test='type == "C"'>
+					SELECT
+						PACKAGE_NO
+					FROM
+						PACKAGE_ITEM
+					WHERE
+						CONCERT_ITEM_NO in (
+										  SELECT
+										  	CONCERT_ITEM_NO
+										  FROM
+										   	CONCERT_ITEM
+										  WHERE
+										   	CONCERT_NO = #{no}
+										 )
+					</when>
+					<when test='type == "R"'>
+					SELECT
+						PACKAGE_NO
+					FROM
+						PACKAGE_ITEM
+					WHERE
+						RESORT_ITEM_NO in (
+										  SELECT
+										  	RESORT_ITEM_NO
+										  FROM
+										   	RESORT_ITEM
+										  WHERE
+										   	RESORT_NO = #{no}
+										 )
+					</when>
+				</choose>
+			)
+			<choose>
+				<when test='status != "전체"'>
+					AND RESERVE_STATUS = #{status}
+				</when>
+			</choose>
+	</select>
+	
+	<select id="getCompanyReservePaging" parameterType="hashmap" resultMap="ReserveMap">
+		SELECT
+			RESERVE_NO, 
+			RESERVE_DATE, 
+			CHECK_IN, 
+			CHECK_OUT, 
+			RESERVE_PRICE, 
+			PACKAGE_NO, 
+			USER_NO, 
+			RESERVE_STATUS, 
+			POINT_USE, 
+			POINT_STACK, 
+			REQUEST, 
+			QTY,
+			REFUND_REASON
+		FROM
+			(SELECT
+				ROW_NUMBER() OVER(ORDER BY CHECK_IN DESC) RN,
+				RESERVE_NO, 
+				RESERVE_DATE, 
+				CHECK_IN, 
+				CHECK_OUT, 
+				RESERVE_PRICE, 
+				PACKAGE_NO, 
+				USER_NO, 
+				RESERVE_STATUS, 
+				POINT_USE, 
+				POINT_STACK, 
+				REQUEST, 
+				QTY,
+				REFUND_REASON
+			FROM
+				RESERVE
+			WHERE
+				PACKAGE_NO in (
+							<choose>
+								<when test='type == "H"'>
+								SELECT
+									PACKAGE_NO
+								FROM
+									PACKAGE_ITEM
+								WHERE
+									HOTEL_ITEM_NO in (
+													  SELECT
+													  	HOTEL_ITEM_NO
+													  FROM
+													   	HOTEL_ITEM
+													  WHERE
+													   	HOTEL_NO = #{no}
+													 )
+								</when>
+								<when test='type == "C"'>
+								SELECT
+									PACKAGE_NO
+								FROM
+									PACKAGE_ITEM
+								WHERE
+									CONCERT_ITEM_NO in (
+													  SELECT
+													  	CONCERT_ITEM_NO
+													  FROM
+													   	CONCERT_ITEM
+													  WHERE
+													   	CONCERT_NO = #{no}
+													 )
+								</when>
+								<when test='type == "R"'>
+								SELECT
+									PACKAGE_NO
+								FROM
+									PACKAGE_ITEM
+								WHERE
+									RESORT_ITEM_NO in (
+													  SELECT
+													  	RESORT_ITEM_NO
+													  FROM
+													   	RESORT_ITEM
+													  WHERE
+													   	RESORT_NO = #{no}
+													 )
+								</when>
+							</choose>
+							  )
+				<choose>
+					<when test='status != "전체"'>
+						AND RESERVE_STATUS = #{status}
+					</when>
+				</choose>
+			)
+		WHERE
+		<![CDATA[
+			rn >= #{min} and rn <= #{max}
+		]]>
+	</select>
+</mapper>

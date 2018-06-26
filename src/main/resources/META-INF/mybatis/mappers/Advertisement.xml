@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.AdvertisementDao">
+	<resultMap type="Advertisement" id="AdvertisementMap">
+		<id property="no" column="Advertisement_no"/>
+		<result property="image" column="Advertisement_image"/>
+		<result property="link" column="Advertisement_link"/>
+		<result property="status" column="Advertisement_status"/>
+	</resultMap>
+	<insert id="insertAdvertisement" parameterType="Advertisement">
+		insert into Advertisement values(ad_seq.nextval,#{image},#{link},#{status})
+	</insert>
+	
+	<select id="selectAdvertisement" parameterType="String" resultMap="AdvertisementMap">
+		select * from Advertisement where advertisement_status = #{value}
+	</select>
+	
+	<delete id="deleteAdvertisement" parameterType="String">
+		delete from Advertisement where advertisement_status = #{value}
+	</delete>
+</mapper>

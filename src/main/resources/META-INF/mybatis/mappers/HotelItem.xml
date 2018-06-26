@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.HotelItemDao">
+
+	<resultMap type="HotelItem" id="HotelItemMap">
+		<id property="no" column="hotel_item_no"/>
+		<result property="name" column="hotel_item_name"/>
+		<result property="type" column="hotel_item_type"/>
+		<result property="price" column="hotel_item_price"/>
+		<result property="count" column="hotel_item_count"/>
+		<result property="status" column="hotel_item_status"/>
+		<result property="hotelNo" column="hotel_no"/>
+		<result property="qty" column="hotel_item_qty"/>
+		<result property="img" column="hotel_item_img"/>
+	</resultMap>
+	
+	<select id="getHotelItemsByNo" parameterType="int" resultType="ItemForm">
+		select
+			I.hotel_item_no			as no
+			, I.hotel_item_name		as name
+			, I.hotel_item_type		as type
+			, I.hotel_item_price	as price
+			, I.hotel_item_count	as count
+			, I.hotel_item_status	as status
+			, I.hotel_no			as hotelNo
+			, I.hotel_item_qty		as qty
+			, I.hotel_item_img		as img
+			, C.company_name		as companyName
+		from
+			hotel_item I, hotel H, company C, customer_user U
+		where
+			I.hotel_no = H.hotel_no
+			and H.cp_no = C.cp_no
+			and C.user_no = U.user_no
+			and C.company_status = 'Y'
+			and U.user_no = #{value}
+	</select>
+	
+	<select id="getHotelItemByNo" parameterType="int" resultMap="HotelItemMap">
+		select
+			hotel_item_no
+			, hotel_item_name
+			, hotel_item_type
+			, hotel_item_price
+			, hotel_item_count
+			, hotel_item_status
+			, hotel_no
+			, hotel_item_qty
+			, hotel_item_img
+		from
+			hotel_item
+		where
+			hotel_item_no = #{value}
+	</select>
+
+	<select id="getHotelItemList" parameterType="int" resultType="HotelItemForm">
+		select DISTINCT
+			A.cp_no					cpNo,
+			A.user_no				userNo,
+			A.company_name			cpName,
+			A.company_status		cpStatus,
+			A.cp_type				cpType,
+			B.hotel_no				htNo,
+			B.hotel_name			htName,
+			B.hotel_address			htAddress,
+			B.hotel_address_detail	htAddressDetail,
+			B.hotel_contents		htContents,
+			B.hotel_tel				htTel,
+			B.hotel_grade			htGrade,
+			B.hotel_star			htStar,
+			B.room_count			htRoomCount,
+			B.hotel_img				htImg,
+			B.hotel_locationlat		htLocationLat,
+			B.hotel_locationlng		htLocationLng,
+			B.hotel_owner			htOwner,
+			B.hotel_phone			htPhone,
+			C.hotel_item_no			hiNo,
+			C.hotel_item_name		hiName,
+			C.hotel_item_type		hiType,
+			C.hotel_item_price		hiPrice,
+			C.hotel_item_count		hiCount,
+			C.hotel_item_status		hiStatus,
+			C.hotel_item_qty		hiQty,
+			C.hotel_item_img		hhiImg
+		from 
+			company A, hotel B, hotel_item C<!-- , hotel_item_option D -->
+		where
+			A.cp_no = B.cp_no
+			and B.hotel_no = C.hotel_no
+			<!-- and C.hotel_item_no = D.hotel_item_no
+			and A.user_no = #{value}-->
+			and A.cp_no = #{value}
+	</select>	
+	
+	<select id="getHotelItemOptions" parameterType="int" resultType="HotelItemOption">
+		select 
+				OPTION_NAME name
+			FROM 
+				HOTEL_ITEM_OPTION
+			where
+				HOTEL_ITEM_NO = #{value}
+	</select>
+	
+	<select id="AllHotelItemName" resultType="HotelItem">
+		select
+			distinct hotel_item_name name
+		from 
+			hotel_item
+	</select>
+	
+	<select id="AllHotelItemType" resultType="HotelItem">
+		select
+			distinct hotel_item_type type
+		from 
+			hotel_item
+	</select>
+	
+	<select id="hotelItemSeq" resultType="int">
+		select
+			hotel_item_seq.nextval
+		from
+			dual
+	</select>
+	
+	<insert id="addHotelItem" parameterType="HotelItem">
+		insert into hotel_item
+			(hotel_item_no,
+			 hotel_item_name,
+			 hotel_item_type,
+			 hotel_item_price,
+			 hotel_item_count,
+			 hotel_item_qty,
+			 hotel_item_img,
+			 hotel_no)
+		values
+			(#{no}, #{name}, #{type}, #{price}, #{count}, #{qty}, #{img}, #{hotelNo})
+	</insert>
+	
+	<insert id="addHotelItemOption" parameterType="HotelItemOption">
+		insert into hotel_item_option
+			(option_name,
+			 hotel_item_no)
+		values
+			(#{name}, #{no})
+	</insert>
+	
+	<select id="getHotelItemQty" parameterType="int" resultType="int">
+		select 
+			hotel_item_qty
+		from
+			hotel_item
+		where
+			hotel_item_no = #{value}
+	</select>
+	
+	<select id="getHotelItemsByCpNo" parameterType="int" resultMap="HotelItemMap">
+		select
+			hotel_item_no
+			, hotel_item_name
+			, hotel_item_type
+			, hotel_item_price
+			, hotel_item_count
+			, hotel_item_status
+			, hotel_no
+			, hotel_item_qty
+			, hotel_item_img
+		from
+			hotel_item
+		where
+			hotel_no = #{value}
+			
+	</select>
+	
+	<update id="updateHotelItemCount" parameterType="hashmap">
+		update
+			hotel_item
+		set
+			hotel_item_count = #{itemCount}
+		where
+			hotel_item_no = #{hNo}
+	</update>
+	
+	<update id="delHotelItem" parameterType="int">
+		update
+			hotel_item
+		set
+			hotel_item_status = 'DELETE'
+		where
+			hotel_item_no = #{value}
+	</update>
+	
+	<update id="updateHotelItem" parameterType="HotelItem">
+		update
+			hotel_item
+		<set>
+			hotel_item_name = #{name},
+			hotel_item_type = #{type},
+			hotel_item_price = #{price},
+			hotel_item_count = #{count},
+			hotel_item_qty = #{qty},
+			<if test="img != null">
+			hotel_item_img = #{img}
+			</if>
+		</set>
+		where
+			hotel_item_no = #{no}
+	</update>
+	
+	<delete id="deleteHotelItemOption" parameterType="int">
+		delete
+			hotel_item_option
+		where
+			hotel_item_no = #{value}
+	</delete>
+</mapper>

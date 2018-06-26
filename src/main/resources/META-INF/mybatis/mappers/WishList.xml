@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.hta.fp.dao.WishListDao">
+	<insert id="addWishlist" parameterType="Wishlist">
+		insert into wishList
+		values (wishlist_seq.nextval, #{url}, #{name}, #{userNo})
+	</insert>
+	
+	<select id="selectWishlist" parameterType="int" resultType="Wishlist">
+	SELECT WISHLIST_NO no, WISHLIST_URL url, WISHLIST_NAME name, USER_NO userNo FROM WISHLIST where user_no = #{value}
+	</select>
+	
+	<select id="selectWishlistbyNo" parameterType="int" resultType="Wishlist">
+	SELECT WISHLIST_NO no, WISHLIST_URL url, WISHLIST_NAME name, USER_NO userNo FROM WISHLIST where WISHLIST_NO = #{value}
+	</select>
+	
+	<delete id="deleteWishlist" parameterType="int">
+		delete
+		from wishlist
+		where wishlist_no = #{value}
+	</delete>
+</mapper>
